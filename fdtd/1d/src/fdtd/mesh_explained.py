@@ -2,6 +2,8 @@ import numpy as np
 import copy
 import math
 
+#Clase para crear la malla
+
 L = 0 # Lower
 U = 1 # Upper
 
@@ -18,14 +20,13 @@ class Mesh:
 
         Lx = abs(box[U] - box[L])
         dx = grid["steps"]
-        self.pos =  np.linspace(box[L], box[U], num=Lx/dx+1, endpoint=True)
-        self.bounds = grid["bounds"]
+        self.pos =  np.linspace(box[L], box[U], num=Lx/dx+1, endpoint=True)   #Me crea los puntos del grid
+        self.bounds = grid["bounds"]        #Fronteras de la caja
 
     def steps(self):
         return self.pos[1]-self.pos[0]  # Assumes everything is equispaced.
 
-    def elemIdToBox(self, id):
-
+    def elemIdToBox(self, id):              #Me da el nombre de mi coordenada
         return ( self.coordinates[ self.elements[id][0] ], \
                  self.coordinates[ self.elements[id][1] ] )
 
