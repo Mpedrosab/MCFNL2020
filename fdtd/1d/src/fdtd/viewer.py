@@ -21,7 +21,6 @@ class Animator:
         line1,    = ax1.plot([], [], '.', markersize=1)
         timeText1 = ax1.text(0.02, 0.95, '', transform=ax1.transAxes)
 
-
         def init():
             line1.set_data([ ], [ ])
             timeText1.set_text('')
@@ -39,3 +38,5 @@ class Animator:
             frames=len(probeTime), blit=True)
 
         plt.show()
+
+
