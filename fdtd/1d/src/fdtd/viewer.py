@@ -36,7 +36,6 @@ class Animator:
         #print(probeTime)
         animation.FuncAnimation(fig, animate, init_func=init,
             frames=len(probeTime), blit=True)
-
         plt.show()
 
 
