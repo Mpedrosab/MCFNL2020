@@ -104,12 +104,27 @@ class Solver:
         eNew[1:-1] = e[1:-1] + cE * (h[1:] - h[:-1])
         
         # Boundary conditions
+<<<<<<< HEAD
         for bound in self._mesh.bounds:
             if bound == "pec":
                 eNew[ 0] = 0.0
                 eNew[-1] = 0.0
             elif bound == 'mur':
                 eNew[ 0] = e[ 1]+(sp.speed_of_light*dt-self._mesh.steps())* (eNew[ 1]-e[ 0]) / (sp.speed_of_light*dt-self._mesh.steps())
+=======
+        for lu in range(2):
+            if lu == 0:
+                pos = 0
+            else:
+                pos = -1
+            if self._mesh.bounds[lu] == "pec":
+                eNew[pos] = 0.0
+            elif self._mesh.bounds[lu] == 'mur':
+                if pos == 0:
+                    eNew[0] =  e[ 1]+(sp.speed_of_light*dt-self._mesh.steps())* (eNew[ 1]-e[ 0]) / (sp.speed_of_light*dt+self._mesh.steps())
+                else:
+                    eNew[-1] = e[-2]+(sp.speed_of_light*dt-self._mesh.steps())* (eNew[-2]-e[ 1]) / (sp.speed_of_light*dt+self._mesh.steps())
+>>>>>>> 298f718d69ac09f2c9cd2bc803f0f18805039a84
             else:
                 raise ValueError("Unrecognized boundary type")
 
