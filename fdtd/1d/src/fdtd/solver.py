@@ -109,7 +109,7 @@ class Solver:
                 eNew[ 0] = 0.0
                 eNew[-1] = 0.0
             elif bound == 'mur':
-                eNew[ 0] = e[ 1]+(sp.speed_of_light*dt-self._mesh.steps())* (eNew[ 1]-[ 0]) / (sp.speed_of_light*dt-self._mesh.steps())
+                eNew[ 0] = e[ 1]+(sp.speed_of_light*dt-self._mesh.steps())* (eNew[ 1]-e[ 0]) / (sp.speed_of_light*dt-self._mesh.steps())
             else:
                 raise ValueError("Unrecognized boundary type")
 
