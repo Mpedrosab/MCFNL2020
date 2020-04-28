@@ -51,22 +51,24 @@ class AnalyticComp:
         sol=[]
         for initial in self._initialCond:
             if (initial["type"] == "gaussian"):   
+                dt=probeTime[1]-probeTime[0]
                 for time in probeTime:
-                    #return np.exp( - ((x-delay)**2 / (2*spread**2)) )
-                    Ereal_right=Solver.movingGaussian(gridE,time, \
-                        sp.speed_of_light,initial["peakPosition"],\
-                        initial["gaussianAmplitude"]/2, \
-                        initial["gaussianSpread"])
-                    Ereal_left=Solver.movingGaussian(gridE,time, \
-                        -sp.speed_of_light,initial["peakPosition"],\
-                        initial["gaussianAmplitude"]/2, \
-                        initial["gaussianSpread"])
-                    sol.append(Ereal_right+Ereal_left)
+                    if time!=0:
+                        time=time-dt
+                        #return np.exp( - ((x-delay)**2 / (2*spread**2)) )
+                        Ereal_right=Solver.movingGaussian(gridE,time, \
+                            sp.speed_of_light,initial["peakPosition"],\
+                            initial["gaussianAmplitude"]/2, \
+                            initial["gaussianSpread"])
+                        Ereal_left=Solver.movingGaussian(gridE,time, \
+                            -sp.speed_of_light,initial["peakPosition"],\
+                            initial["gaussianAmplitude"]/2, \
+                            initial["gaussianSpread"])
+                        sol.append(Ereal_right+Ereal_left)
             else:
                 raise ValueError("Invalid source type: " + initial["type"])
            # plt.plot(gridE,sol[9])
-        sol=[sol[0]]+sol[:-1]            #Repeat the initial because it is repeated in Solver
-        return sol
+        return sol.append(sol[-1])
 
     def L2Error(self, solReal=None):
 
