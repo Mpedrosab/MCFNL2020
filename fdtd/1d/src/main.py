@@ -21,7 +21,7 @@ if len(sys.argv) == 1:
 
 inputFilename = ''.join(args.input).strip()
 '''
-inputFilename='..\\tests\\cavity.json'
+inputFilename='..\\tests\\cavity_dispersive.json'
 print("--- Reading file: %s"%(inputFilename))
 data = json.load(open(inputFilename))
 
@@ -43,6 +43,7 @@ solNum=solver.getProbes()[0]
 Animator(mesh, solNum)
 
 #%%
+'''
 print('--- Comparison with analytical solution')
 comparison=AnalyticComp(mesh, solNum, data["initialCond"])
 solReal=comparison.AnalyticalSol(comparison.gridE,comparison.probeTime)
@@ -51,3 +52,4 @@ comparison.AnimatorTogether(solNum,solReal)
 comparison.PrintErr(solNum,err)
 
 print('=== Program finished')
+'''
