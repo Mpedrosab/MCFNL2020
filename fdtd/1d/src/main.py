@@ -9,7 +9,7 @@ from fdtd.solver import Solver
 from fdtd.viewer import Animator
 from fdtd.comparison import AnalyticComp
 print("=== Python FDTD 1D")
-
+'''
 parser = argparse.ArgumentParser(description='Python FDTD 1D')
 parser.add_argument('-i', '--input', nargs=1, type=str)
 args = parser.parse_args()
@@ -18,7 +18,11 @@ if len(sys.argv) == 1:
     sys.exit()
 
 inputFilename = ''.join(args.input).strip()
+'''
+
+inputFilename="../tests/cavity.json"
 print("--- Reading file: %s"%(inputFilename))
+
 data = json.load(open(inputFilename))
 
 print('--- Initializing mesh')
