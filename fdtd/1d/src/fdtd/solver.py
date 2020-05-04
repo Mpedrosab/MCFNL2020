@@ -87,6 +87,7 @@ class Solver:
                     numberOfTimeSteps-1, min, sec))
         
         print("    CPU Time: %f [s]" % (time.time() - tic))
+        self._calcDispersionVar(dt)
 
     def _dt(self):
         return self.options["cfl"] * self._mesh.steps() / sp.speed_of_light  
@@ -104,6 +105,7 @@ class Solver:
         cE = dt / sp.epsilon_0 / self._mesh.steps()
         eNew[1:-1] = e[1:-1] + cE * (h[1:] - h[:-1])
         
+        self._calcDispersionVar(dt)
         # Boundary conditions
         for lu in range(2):
             if lu == 0:
@@ -159,8 +161,14 @@ class Solver:
                 values[:] = self.old.e[ ids[0]:ids[1] ]
                 p["values"].append(values)
 
-    def _calcDispersionVar(self):
-
+    def _calcDispersionVar(self,dt):
+        for medium in self._media:
+            ap=np.empty(len([medium["ap"]]),dtype=complex)
+            cp=np.empty(len([medium["ap"]]),dtype=complex)
+            for i in range(0,len([medium["ap"]])):
+                ap[i]=complex(medium["ap"][i])
+                cp[i]=complex(medium["cp"][i])
+        print(ap,cp)
         return 
 
     @staticmethod
