@@ -26,7 +26,17 @@ class Solver:
         
         self._mesh = copy.deepcopy(mesh)
         self._initialCond = copy.deepcopy(initialCond)
+
+        #Get media properties
         self._media=copy.deepcopy(media)
+        self.epsilon=self._media['permitivity']*sp.epsilon_0
+        #Copy outside since it is needed in every loop. Speed up the code
+        self.ap=np.empty(len([self._media["ap"]]),dtype=complex)
+        self.cp=np.empty(len([self._media["ap"]]),dtype=complex)
+        for i in range(0,len([self._media["ap"]])):
+            self.ap[i]=complex(self._media["ap"][i])
+            self.cp[i]=complex(self._media["cp"][i])
+
         self._probes = copy.deepcopy(probes)
         for p in self._probes:
             box = self._mesh.elemIdToBox(p["elemId"])
@@ -102,10 +112,11 @@ class Solver:
     def _updateE(self, t, dt):
         (e, h) = self.old.get()
         eNew = np.zeros( self.old.e.shape )
-        cE = dt / sp.epsilon_0 / self._mesh.steps()
-        eNew[1:-1] = e[1:-1] + cE * (h[1:] - h[:-1])
+        #cE = dt / sp.epsilon_0 / self._mesh.steps()
+        #eNew[1:-1] = e[1:-1] + cE * (h[1:] - h[:-1])
         
-        self._calcDispersionVar(dt)
+        kp,bp=self._calcDispersionVar(dt,ap,cp)
+        eNew[1:-1] = e[1:-1] + cE * (h[1:] - h[:-1])
         # Boundary conditions
         for lu in range(2):
             if lu == 0:
@@ -161,15 +172,12 @@ class Solver:
                 values[:] = self.old.e[ ids[0]:ids[1] ]
                 p["values"].append(values)
 
-    def _calcDispersionVar(self,dt):
-        for medium in self._media:
-            ap=np.empty(len([medium["ap"]]),dtype=complex)
-            cp=np.empty(len([medium["ap"]]),dtype=complex)
-            for i in range(0,len([medium["ap"]])):
-                ap[i]=complex(medium["ap"][i])
-                cp[i]=complex(medium["cp"][i])
-        print(ap,cp)
-        return 
+    def _calcDispersionVar(self,dt,ap,cp):
+
+        dem=(1-ap*dt/2.0)
+        kp = (1+ap*dt/2.0)/dem
+        bp =  sp.epsilon_0*cp*dt/dem
+        return kp,bp
 
     @staticmethod
     def _gaussian(x, delay, spread):
