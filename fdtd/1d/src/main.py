@@ -31,7 +31,7 @@ print('--- Initializing mesh')
 mesh = Mesh(data["coordinates"], data["elements"], data["grid"])
 
 print('--- Initializing solver')
-solver = Solver(mesh, data["options"], data["probes"], data["sources"],data["initialCond"])
+solver = Solver(mesh, data["options"], data["probes"], data["sources"],data["media"],data["initialCond"])
 
 print('--- Solving')
 solver.solve(data["options"]["finalTime"])

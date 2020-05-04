@@ -21,11 +21,12 @@ class Solver:
     
     _timeStepPrint = 100
 
-    def __init__(self, mesh, options, probes,sources, initialCond=[{"type": "none"}]):
+    def __init__(self, mesh, options, probes,sources,media, initialCond=[{"type": "none"}]):
         self.options = options
         
         self._mesh = copy.deepcopy(mesh)
         self._initialCond = copy.deepcopy(initialCond)
+        self._media=copy.deepcopy(media)
         self._probes = copy.deepcopy(probes)
         for p in self._probes:
             box = self._mesh.elemIdToBox(p["elemId"])
@@ -157,6 +158,10 @@ class Solver:
                 values = np.zeros(ids[U]-ids[L])
                 values[:] = self.old.e[ ids[0]:ids[1] ]
                 p["values"].append(values)
+
+    def _calcDispersionVar(self):
+
+        return 
 
     @staticmethod
     def _gaussian(x, delay, spread):
