@@ -10,12 +10,12 @@ L = 0 # Lower
 U = 1 # Upper
 
 class Fields: 
-    def __init__(self, e, h):
+    def __init__(self, e, h, Jp_old):
         self.e = e
         self.h = h
-    
+        self.Jp_old= Jp_old
     def get(self):
-        return (self.e, self.h)
+        return (self.e, self.h,self.Jp_old)
 
 class Solver:
     
@@ -29,14 +29,21 @@ class Solver:
 
         #Get media properties
         self._media=copy.deepcopy(media)
-        self.epsilon=self._media['permitivity']*sp.epsilon_0
+        self._epsilon=self._media['permittivity']
         #Copy outside since it is needed in every loop. Speed up the code
-        self.ap=np.empty(len([self._media["ap"]]),dtype=complex)
-        self.cp=np.empty(len([self._media["ap"]]),dtype=complex)
-        for i in range(0,len([self._media["ap"]])):
-            self.ap[i]=complex(self._media["ap"][i])
-            self.cp[i]=complex(self._media["cp"][i])
+        self._ap=np.empty(len(self._media["ap"]),dtype=complex)
+        self._cp=np.empty(len(self._media["ap"]),dtype=complex)
+        for i in range(0,len(self._media["ap"])):
+            self._ap[i]=complex(self._media["ap"][i])
+            self._cp[i]=complex(self._media["cp"][i])
 
+        #WATCH OUT! Normalize permittivity to 1
+     
+        self._ap = self._ap / self._media['permittivity']
+        self._cp = self._cp / self._media['permittivity']
+        self._epsilon = self._epsilon / self._media['permittivity']
+       
+        
         self._probes = copy.deepcopy(probes)
         for p in self._probes:
             box = self._mesh.elemIdToBox(p["elemId"])
@@ -73,7 +80,8 @@ class Solver:
             source["index"] = ids
 
         self.old = Fields(e = values.copy(),
-                          h = np.zeros( mesh.pos.size-1 ) )
+                          h = np.zeros( mesh.pos.size-1 ),
+                          Jp_old = np.zeros(( mesh.pos.size, len(self._media["ap"]))) )
 
 
     def solve(self, finalTime):
@@ -81,6 +89,8 @@ class Solver:
         t = 0.0
         dt = self._dt()
         numberOfTimeSteps = int(finalTime / dt)
+        self._kp,self._bp=self._calcDispersionVar(dt,self._ap,self._cp)
+
         for n in range(numberOfTimeSteps):
             self._updateE(t, dt)
             t += dt/2.0
@@ -97,7 +107,7 @@ class Solver:
                     numberOfTimeSteps-1, min, sec))
         
         print("    CPU Time: %f [s]" % (time.time() - tic))
-        self._calcDispersionVar(dt)
+
 
     def _dt(self):
         return self.options["cfl"] * self._mesh.steps() / sp.speed_of_light  
@@ -110,13 +120,18 @@ class Solver:
         return res
 
     def _updateE(self, t, dt):
-        (e, h) = self.old.get()
+        (e, h, Jp_old) = self.old.get()
         eNew = np.zeros( self.old.e.shape )
-        #cE = dt / sp.epsilon_0 / self._mesh.steps()
+        JpNew = np.zeros( self.old.Jp_old.shape )
+        cE2 = dt / sp.epsilon_0 / self._mesh.steps()
         #eNew[1:-1] = e[1:-1] + cE * (h[1:] - h[:-1])
         
-        kp,bp=self._calcDispersionVar(dt,ap,cp)
-        eNew[1:-1] = e[1:-1] + cE * (h[1:] - h[:-1])
+
+        cE = (2*dt/((2*self._epsilon*sp.epsilon_0+np.sum(2*np.real(self._bp)))*self._mesh.steps()))
+        #Term multiplying e[1:-1] is 1 since conductivity=0
+        eNew[1:-1] = e[1:-1] + cE * ((h[1:] - h[:-1])-np.real(np.sum((1+self._kp)*Jp_old[1:-1,:],1)))
+        for i in range(0,np.shape(Jp_old)[1]):
+            JpNew[1:-1,i] = self._kp[i]*Jp_old[1:-1,i]+ self._bp[i] * (eNew[1:-1] - e[1:-1]) / dt
         # Boundary conditions
         for lu in range(2):
             if lu == 0:
@@ -153,10 +168,11 @@ class Solver:
                 raise ValueError("Invalid source type: " + source["type"])
 
         e[:] = eNew[:]
+        Jp_old[:] = JpNew[:]
         
     def _updateH(self, t, dt):      
         hNew = np.zeros( self.old.h.shape )
-        (e, h) = self.old.get()
+        (e, h,Jp_old) = self.old.get()
         cH = dt / sp.mu_0 / self._mesh.steps()
         hNew[:] = h[:] + cH * (e[1:] - e[:-1])
         h[:] = hNew[:]
@@ -175,9 +191,9 @@ class Solver:
     def _calcDispersionVar(self,dt,ap,cp):
 
         dem=(1-ap*dt/2.0)
-        kp = (1+ap*dt/2.0)/dem
-        bp =  sp.epsilon_0*cp*dt/dem
-        return kp,bp
+        self._kp = (1+ap*dt/2.0)/dem
+        self._bp =  sp.epsilon_0*cp*dt/dem
+        return self._kp,self._bp
 
     @staticmethod
     def _gaussian(x, delay, spread):
