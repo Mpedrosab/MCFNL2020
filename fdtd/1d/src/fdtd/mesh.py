@@ -44,3 +44,7 @@ class Mesh:
             id = np.array(self.toIds(coord)[0], dtype=int)
             res.append( np.array([ self.pos[id] ]) )
         return res
+
+    def Wall(self, ):
+
+        return wallCoord

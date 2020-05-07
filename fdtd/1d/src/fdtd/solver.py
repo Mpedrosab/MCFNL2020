@@ -21,7 +21,7 @@ class Solver:
     
     _timeStepPrint = 100
 
-    def __init__(self, mesh, options, probes,sources,media, initialCond=[{"type": "none"}]):
+    def __init__(self, mesh, options, probes,sources,media, initialCond=[{"type": "none"}],dispersiveWall=None):
         self.options = options
         
         self._mesh = copy.deepcopy(mesh)
@@ -30,6 +30,7 @@ class Solver:
         #Get media properties
         self._media=copy.deepcopy(media)
         self._epsilon=self._media['permittivity']
+
         #Copy outside since it is needed in every loop. Speed up the code
         self._ap=np.empty(len(self._media["ap"]),dtype=complex)
         self._cp=np.empty(len(self._media["ap"]),dtype=complex)
@@ -39,9 +40,9 @@ class Solver:
 
         #WATCH OUT! Normalize permittivity to 1
      
-        self._ap = self._ap / self._media['permittivity']
-        self._cp = self._cp / self._media['permittivity']
-        self._epsilon = self._epsilon / self._media['permittivity']
+       # self._ap = self._ap / self._media['permittivity']
+        #self._cp = self._cp / self._media['permittivity']
+       # self._epsilon = self._epsilon / self._media['permittivity']
        
         
         self._probes = copy.deepcopy(probes)

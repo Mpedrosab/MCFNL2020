@@ -8,7 +8,7 @@ from fdtd.mesh import Mesh
 from fdtd.solver import Solver
 from fdtd.viewer import Animator
 from fdtd.comparison import AnalyticComp
-
+from fdtd.dispersiveMedia import DispersiveMedia
 print("=== Python FDTD 1D")
 
 '''
@@ -29,9 +29,11 @@ data = json.load(open(inputFilename))
 
 print('--- Initializing mesh')
 mesh = Mesh(data["coordinates"], data["elements"], data["grid"])
-
+#wall = DispersiveMedia(mesh,data["dispersiveWalls"])
 print('--- Initializing solver')
-solver = Solver(mesh, data["options"], data["probes"], data["sources"],data["media"],data["initialCond"])
+
+
+solver = Solver(mesh, data["options"], data["probes"], data["sources"],data["dispersiveWalls"],data["initialCond"])
 
 print('--- Solving')
 solver.solve(data["options"]["finalTime"])
