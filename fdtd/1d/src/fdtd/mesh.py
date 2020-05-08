@@ -16,7 +16,7 @@ class Mesh:
         else:
             raise ValueError("Grid data must contain \"elemId\" or \"box\".")
 
-        Lx = abs(box[U] - box[L])
+        Lx = abs(box[U] - box[L]) #length box
         dx = grid["steps"]
         self.pos =  np.linspace(box[L], box[U], num=int(Lx/dx+1), endpoint=True)
         self.bounds = grid["bounds"]
@@ -45,6 +45,6 @@ class Mesh:
             res.append( np.array([ self.pos[id] ]) )
         return res
 
-    def Wall(self, ):
+    def layer(self, ):
 
-        return wallCoord
+        return layerCoord

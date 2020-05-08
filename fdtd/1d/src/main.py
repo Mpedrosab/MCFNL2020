@@ -29,21 +29,22 @@ data = json.load(open(inputFilename))
 
 print('--- Initializing mesh')
 mesh = Mesh(data["coordinates"], data["elements"], data["grid"])
-#wall = DispersiveMedia(mesh,data["dispersiveWalls"])
+layer = DispersiveMedia(mesh,data["dispersiveLayers"])
+indeces = layer.layerIndex(mesh)
 print('--- Initializing solver')
 
 
-solver = Solver(mesh, data["options"], data["probes"], data["sources"],data["dispersiveWalls"],data["initialCond"])
+solver = Solver(mesh, data["options"], data["probes"], data["sources"],data["dispersiveWalls"])
 
 print('--- Solving')
 solver.solve(data["options"]["finalTime"])
-
+'''
 print('--- Visualizing')
 #print(mesh)
 #print(solver.getProbes()[0])
 solNum=solver.getProbes()[0]
 Animator(mesh, solNum)
-
+'''
 #%%
 '''
 print('--- Comparison with analytical solution')
