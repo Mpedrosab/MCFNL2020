@@ -47,7 +47,10 @@ class Solver:
             #Copy outside since it is needed in every loop. Speed up the code
             self._ap=self._dispLayer.ap
             self._cp=self._dispLayer.cp 
+             #Changed?
             self.oldJp = ComplexField(Jp_old = np.zeros(( self._dispLayer.coords.size, len(self._dispLayer.ap))) )      #Takes the size of the layer, not the full grid
+          #  self.oldJp = ComplexField(Jp_old = np.zeros(( mesh.pos.size, len(self._dispLayer.ap))) )      #Takes the size of the layer, not the full grid
+
             self._layerIndices = self._dispLayer.indices
         self._probes = copy.deepcopy(probes)
         for p in self._probes:
@@ -132,18 +135,22 @@ class Solver:
 
         cE = dt / sp.epsilon_0 / self._mesh.steps()
         eNew[1:-1] = e[1:-1] +    cE * (h[1:] - h[:-1])
-        
+
         if self._dispLayer is not None:
             Jp_old = self.oldJp.get()
-            JpNew = np.zeros( self.oldJp.Jp_old.shape )
+            JpNew = np.zeros( Jp_old.shape )
             cE2 = (2*dt/((2*self._epsilon*sp.epsilon_0+np.sum(2*np.real(self._bp)))*self._mesh.steps()))
             #Term multiplying e[1:-1] is 1 since conductivity=0
             #Need to add an extra term to indices for dh/dx
-            indH= np.concatenate(([self._layerIndices[0]-1],self._layerIndices,[self._layerIndices[-1]+1]))
-            eNew[self._layerIndices] = e[self._layerIndices] + cE2 * ((h[indH[1:]] \
-                - h[indH[:-1]])-np.real(np.sum((1+self._kp)*Jp_old,1)))
-            for i in range(0,np.shape(Jp_old)[1]):
-                JpNew[:,i] = self._kp[i]*Jp_old[:,i]+ self._bp[i] * (eNew[self._layerIndices] - e[self._layerIndices]) / dt
+            #indH= np.concatenate(([self._layerIndices[0]-1],self._layerIndices,))
+            indH = self._layerIndices[:-1]
+            #Changed?
+            eNew[self._layerIndices[1:-1]] = e[self._layerIndices[1:-1]] + cE2 * ((h[indH[1:]] \
+               - h[indH[:-1]])-np.real(np.sum((1+self._kp)*Jp_old[1:-1,:],1)))
+           # eNew[1:-1] = e[1:-1] + cE2 * ((h[1:] - h[:-1])-np.real(np.sum((1+self._kp)*Jp_old[1:-1],1)))
+
+
+        #add mur conditions to layer
         # Boundary conditions
         for lu in range(2):
             if lu == 0:
@@ -178,13 +185,22 @@ class Solver:
                 continue
             else:
                 raise ValueError("Invalid source type: " + source["type"])
+        
+        if self._dispLayer is not None:
 
+            #Get new JpNew
+            for i in range(0,np.shape(Jp_old)[1]):
+                
+                #Changed?
+               JpNew[1:-1,i] = self._kp[i]*Jp_old[1:-1,i]+ self._bp[i] * (eNew[self._layerIndices[1:-1]] - e[self._layerIndices[1:-1]]) / dt
+               # JpNew[1:-1,i] = self._kp[i]*Jp_old[1:-1,i]+ self._bp[i] * (eNew[1:-1] - e[1:-1]) / dt
+            Jp_old[:] = JpNew[:]
         e[:] = eNew[:]
-        Jp_old[:] = JpNew[:]
+        
         
     def _updateH(self, t, dt):      
         hNew = np.zeros( self.old.h.shape )
-        (e, h,Jp_old) = self.old.get()
+        (e, h) = self.old.get()
         cH = dt / sp.mu_0 / self._mesh.steps()
         hNew[:] = h[:] + cH * (e[1:] - e[:-1])
         h[:] = hNew[:]

@@ -21,7 +21,7 @@ if len(sys.argv) == 1:
 
 inputFilename = ''.join(args.input).strip()
 '''
-inputFilename='..\\tests\\cavity_dispersive.json'
+inputFilename='..\\tests\\cavity_dispersive_test2.json'
 print("--- Reading file: %s"%(inputFilename))
 data = json.load(open(inputFilename))
 
@@ -29,22 +29,23 @@ data = json.load(open(inputFilename))
 
 print('--- Initializing mesh')
 mesh = Mesh(data["coordinates"], data["elements"], data["grid"])
+layer = None
 layer = DispersiveMedia(mesh,data["dispersiveLayers"])
-indeces = layer.layerIndices(mesh)
+#indeces = layer.layerIndices(mesh)
 print('--- Initializing solver')
 
-
+0
 solver = Solver(mesh, data["options"], data["probes"], data["sources"],dispLayer = layer)
 
 print('--- Solving')
 solver.solve(data["options"]["finalTime"])
-'''
+
 print('--- Visualizing')
 #print(mesh)
 #print(solver.getProbes()[0])
 solNum=solver.getProbes()[0]
-Animator(mesh, solNum)
-'''
+Animator(mesh, solNum,layer=layer)
+
 #%%
 '''
 print('--- Comparison with analytical solution')
