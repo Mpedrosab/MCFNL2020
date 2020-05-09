@@ -56,8 +56,8 @@
                 "1.443-8.219e1j"
             ],
             "unitsFreq": "eV",
-            "startPosition": 0.6,
-            "width":  0.1
+            "startPosition": 0.025,
+            "width":  0.95
         },
 
     "probes": [
