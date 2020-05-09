@@ -9,6 +9,7 @@ from fdtd.solver import Solver
 from fdtd.viewer import Animator
 from fdtd.comparison import AnalyticComp
 from fdtd.dispersiveMedia import DispersiveMedia
+from measure.Transmittance import MeasureTransmittance
 print("=== Python FDTD 1D")
 
 '''
@@ -29,7 +30,7 @@ data = json.load(open(inputFilename))
 
 print('--- Initializing mesh')
 mesh = Mesh(data["coordinates"], data["elements"], data["grid"])
-layer = None
+#layer = None
 layer = DispersiveMedia(mesh,data["dispersiveLayers"])
 #indeces = layer.layerIndices(mesh)
 print('--- Initializing solver')
@@ -40,9 +41,10 @@ print('--- Solving')
 solver.solve(data["options"]["finalTime"])
 
 print('--- Visualizing')
-#print(mesh)
-#print(solver.getProbes()[0])
 solNum=solver.getProbes()[0]
+
+#Measure transmittance
+transmittance = MeasureTransmittance(layer,solNum)
 Animator(mesh, solNum,layer=layer)
 
 #%%
