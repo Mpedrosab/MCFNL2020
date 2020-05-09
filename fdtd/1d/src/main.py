@@ -9,7 +9,7 @@ from fdtd.solver import Solver
 from fdtd.viewer import Animator
 from fdtd.comparison import AnalyticComp
 from fdtd.dispersiveMedia import DispersiveMedia
-from measure.Transmittance import MeasureTransmittance
+from measure.Transmittance import MeasureTransmittance, AnalyticTransmittance, PlotTransmittance
 print("=== Python FDTD 1D")
 
 '''
@@ -22,7 +22,7 @@ if len(sys.argv) == 1:
 
 inputFilename = ''.join(args.input).strip()
 '''
-inputFilename='..\\tests\\cavity_dispersive_test2.json'
+inputFilename='..\\tests\\cavity_dispersive_test_NoComplex.json'
 print("--- Reading file: %s"%(inputFilename))
 data = json.load(open(inputFilename))
 
@@ -45,8 +45,16 @@ solNum=solver.getProbes()[0]
 
 #Measure transmittance
 transmittance = MeasureTransmittance(layer,solNum)
-Animator(mesh, solNum,layer=layer)
+freq, transfft = transmittance.AmplVsFreq()
+PlotTransmittance(freq, transfft)
 
+
+#Analytical transmittance
+transmittanceReal = AnalyticTransmittance(layer)
+transReal = transmittanceReal.T(freq)
+PlotTransmittance(freq, transReal)
+
+Animator(mesh, solNum,layer=layer)
 #%%
 '''
 print('--- Comparison with analytical solution')

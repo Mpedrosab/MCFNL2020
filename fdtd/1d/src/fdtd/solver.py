@@ -74,7 +74,7 @@ class Solver:
                        sp.speed_of_light,initial["peakPosition"],\
                        initial["gaussianAmplitude"], \
                        initial["gaussianSpread"] )  
-                    p["values"]= values[ids[0]:ids[1]]
+                    p["values"]= [values[ids[0]:ids[1]]]
                         #plt.plot(position,eNew)
                 else:
                     raise ValueError(\

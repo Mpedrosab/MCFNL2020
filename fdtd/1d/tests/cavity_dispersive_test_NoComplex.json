@@ -38,12 +38,12 @@
     ],
     "dispersiveLayers": 
         {
-            "permittivity": 1,
+            "permittivity": 5,
             "ap": [
-                "1e7+1e7j","-1e7+1e7j"
+                0
             ],
             "cp": [
-                "0.5e7+2e7j","-3e7-0.1e7j"
+                0
             ],
             "unitsFreq": "Hz",
             "startPosition": 0.7,

@@ -44,12 +44,12 @@ class Panel:
             self._den(omega)
 
 plt.figure()
-omega = np.linspace(1e2, 1e10, 1e2+1) * 2 * np.pi
-plt.plot(omega, np.abs(Panel(10e-3,  5,   .0).R(omega)))
-plt.plot(omega, np.abs(Panel(10e-3,  5,   .0).T(omega)))
+omega = np.linspace(1e2/(2 * np.pi), 1e10/(2 * np.pi), int(1e2+1)) * 2 * np.pi
+#plt.plot(omega, np.abs(Panel(0.1,  5,   .0).R(omega)))
+plt.plot(omega, np.abs(Panel(0.05,  5,   .0).T(omega)))
 
 plt.figure()
-omega = np.logspace(2, 10, 1e2+1) * 2 * np.pi
+omega = np.logspace(2, 10, int(1e2+1)) * 2 * np.pi
 plt.loglog(omega, np.abs(Panel(10e-6,  1, 50e3).T(omega)))
 plt.loglog(omega, np.abs(Panel(100e-6, 1, 50e3).T(omega)))
 
