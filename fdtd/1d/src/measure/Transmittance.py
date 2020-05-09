@@ -20,32 +20,30 @@ class MeasureTransmittance:
         i=0
         for p in probe['values']:
 
-            self._initE[i] = p[0][self._initIndex ]
-            self._finalE = p[0][self._endIndex ]
+            if i==0:        #First element is a list with an array inside (do not know why)
+                self._initE[i] = p[0][self._initIndex ]
+                self._endE[i] = p[0][self._endIndex ]
+            else:
+                self._initE[i] = p[self._initIndex ]
+                self._endE[i] = p[self._endIndex ]               
             i+=1
 
-
-        #Transmittance in time
-        self.T = self.getT(self._initE,self._endE)
-
-        #Transmittance in freq
-        self.TFreq = self.AmplVsFreq(self.t,self.T)
     def getT(self, initE, endE):
-        return endE-initE
+        self.T = endE-initE
+        return self.T
 
-    def AmplVsFreq(self,t,f):
+    def AmplVsFreq(self):
+        self.T = self.getT(self._initE, self._endE)
+        self.f_Tq = np.fft.fftfreq(len(self.t)) / (self.t[1]-self.t[0])
+        self.Tq = np.fft.fft(self.T )
 
-        fq = np.fft.fftfreq(len(t)) / (t[1]-t[0])
-        f_fq = np.fft.fft(f)
+        return (self.f_Tq,np.abs(self.Tq))
 
-    '''
-    plt.figure()
-    plt.plot(t, f)
-
-    plt.figure()
-    plt.plot(np.fft.fftshift(fq), np.fft.fftshift(np.abs(f_fq)))
-
-    plt.show()
-
-    print('=== Program finished ===')
-    '''
+    def PlotTransmittance(self,freq,Trans):
+        plt.figure()
+        plt.plot(freq, np.abs(Trans))
+        plt.figure()
+        plt.plot(np.fft.fftshift(freq), np.fft.fftshift(np.abs(Trans)))
+        plt.xlabel('Frequency [Hz]')
+        plt.ylabel('Transmittance')
+        plt.show()
