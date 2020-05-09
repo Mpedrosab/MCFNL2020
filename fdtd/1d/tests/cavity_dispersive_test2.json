@@ -20,7 +20,7 @@
 
     "grid": {   
         "elemId": 0,
-        "steps": 0.025,
+        "steps": 0.015,
         "bounds": ["mur", "mur"]
     },
 

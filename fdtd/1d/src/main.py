@@ -34,7 +34,6 @@ layer = DispersiveMedia(mesh,data["dispersiveLayers"])
 #indeces = layer.layerIndices(mesh)
 print('--- Initializing solver')
 
-0
 solver = Solver(mesh, data["options"], data["probes"], data["sources"],dispLayer = layer)
 
 print('--- Solving')

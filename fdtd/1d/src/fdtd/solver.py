@@ -95,6 +95,7 @@ class Solver:
         tic = time.time()
         t = 0.0
         dt = self._dt()
+        print ('time step:',dt)
         numberOfTimeSteps = int(finalTime / dt)
 
         if self._dispLayer is not None:
