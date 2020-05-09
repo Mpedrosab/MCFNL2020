@@ -30,11 +30,11 @@ data = json.load(open(inputFilename))
 print('--- Initializing mesh')
 mesh = Mesh(data["coordinates"], data["elements"], data["grid"])
 layer = DispersiveMedia(mesh,data["dispersiveLayers"])
-indeces = layer.layerIndex(mesh)
+indeces = layer.layerIndices(mesh)
 print('--- Initializing solver')
 
 
-solver = Solver(mesh, data["options"], data["probes"], data["sources"],data["dispersiveWalls"])
+solver = Solver(mesh, data["options"], data["probes"], data["sources"],dispLayer = layer)
 
 print('--- Solving')
 solver.solve(data["options"]["finalTime"])

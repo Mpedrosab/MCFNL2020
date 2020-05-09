@@ -3,6 +3,7 @@
     
     "options": {
         "finalTime": 20e-9,
+        "timeUnits": "s",
         "cfl": 0.5
     },
 
@@ -20,33 +21,28 @@
     "grid": {   
         "elemId": 0,
         "steps": 0.025,
-        "bounds": ["pec", "pec"]
+        "bounds": ["mur", "mur"]
     },
 
     "sources": [
         {
-            "type": "none",
+            "type": "dipole", 
+            "direction": [0.0, 0.0, 1.0],
+            "magnitude": {
+                "type": "gaussian",
+                "gaussianDelay":  1.25e-9,
+                "gaussianSpread": 0.25e-9
+            },
             "elemId": 1
         }
     ],
-    "initialCond":[
-        {
-    
-            "type": "gaussian",
-            "gaussianSpread": 0.05,
-            "gaussianAmplitude": 0.5,
-            "peakPosition": 0.5
-        }
-    
-    ],
-    
-    "media": 
+    "dispersiveLayers": 
         {
             "permittivity": 0.405,
             "ap": [
                 "-2.502e-2-8.626e-3j",
                 "-2.021e-1-9.407e-1j",
-                "-1.467e-1-1.338j",
+                "-1.467e1-1.338j",
                 "-2.997e-1-4.034j",
                 "-1.896-4.808j",
                 "-9.396-6.477j"
@@ -58,7 +54,10 @@
                 "6.391e-1-7.186e-2j",
                 "1.806+4.563j",
                 "1.443-8.219e1j"
-            ]
+            ],
+            "unitsFreq": "eV",
+            "startPosition": 0.6,
+            "width":  0.1
         },
 
     "probes": [

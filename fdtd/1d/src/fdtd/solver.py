@@ -10,41 +10,45 @@ L = 0 # Lower
 U = 1 # Upper
 
 class Fields: 
-    def __init__(self, e, h, Jp_old):
+    def __init__(self, e, h):
         self.e = e
         self.h = h
+
+    def get(self):
+        return (self.e, self.h)
+
+class ComplexField: 
+    '''
+        For dispersive media
+    '''
+    def __init__(self, Jp_old):
         self.Jp_old= Jp_old
     def get(self):
-        return (self.e, self.h,self.Jp_old)
+        return (self.Jp_old)        #Define for the whole mesh but only use it
+                                    # where the dispersive layers is placed
+
 
 class Solver:
     
     _timeStepPrint = 100
 
-    def __init__(self, mesh, options, probes,sources,media, initialCond=[{"type": "none"}],dispersiveWall=None):
+    def __init__(self, mesh, options, probes,sources, initialCond=[{"type": "none"}],dispLayer=None):
         self.options = options
         
         self._mesh = copy.deepcopy(mesh)
         self._initialCond = copy.deepcopy(initialCond)
+        self._dispLayer = None          #need to check along the code if there is a layer
+        #Get dispersivee media properties in case it is defined
+        if dispLayer is not None:
 
-        #Get media properties
-        self._media=copy.deepcopy(media)
-        self._epsilon=self._media['permittivity']
+            self._dispLayer=copy.deepcopy(dispLayer)
+            self._epsilon=self._dispLayer.epsilon
 
-        #Copy outside since it is needed in every loop. Speed up the code
-        self._ap=np.empty(len(self._media["ap"]),dtype=complex)
-        self._cp=np.empty(len(self._media["ap"]),dtype=complex)
-        for i in range(0,len(self._media["ap"])):
-            self._ap[i]=complex(self._media["ap"][i])
-            self._cp[i]=complex(self._media["cp"][i])
-
-        #WATCH OUT! Normalize permittivity to 1
-     
-       # self._ap = self._ap / self._media['permittivity']
-        #self._cp = self._cp / self._media['permittivity']
-       # self._epsilon = self._epsilon / self._media['permittivity']
-       
-        
+            #Copy outside since it is needed in every loop. Speed up the code
+            self._ap=self._dispLayer.ap
+            self._cp=self._dispLayer.cp 
+            self.oldJp = ComplexField(Jp_old = np.zeros(( self._dispLayer.coords.size, len(self._dispLayer.ap))) )      #Takes the size of the layer, not the full grid
+            self._layerIndices = self._dispLayer.indices
         self._probes = copy.deepcopy(probes)
         for p in self._probes:
             box = self._mesh.elemIdToBox(p["elemId"])
@@ -81,8 +85,7 @@ class Solver:
             source["index"] = ids
 
         self.old = Fields(e = values.copy(),
-                          h = np.zeros( mesh.pos.size-1 ),
-                          Jp_old = np.zeros(( mesh.pos.size, len(self._media["ap"]))) )
+                          h = np.zeros( mesh.pos.size-1 ) )
 
 
     def solve(self, finalTime):
@@ -90,7 +93,9 @@ class Solver:
         t = 0.0
         dt = self._dt()
         numberOfTimeSteps = int(finalTime / dt)
-        self._kp,self._bp=self._calcDispersionVar(dt,self._ap,self._cp)
+
+        if self._dispLayer is not None:
+            self._kp,self._bp=self._dispLayer ._calcDispersionVar(dt,self._dispLayer.ap,self._dispLayer.cp)
 
         for n in range(numberOfTimeSteps):
             self._updateE(t, dt)
@@ -121,18 +126,24 @@ class Solver:
         return res
 
     def _updateE(self, t, dt):
-        (e, h, Jp_old) = self.old.get()
+        (e, h) = self.old.get()
         eNew = np.zeros( self.old.e.shape )
-        JpNew = np.zeros( self.old.Jp_old.shape )
-        cE2 = dt / sp.epsilon_0 / self._mesh.steps()
-        #eNew[1:-1] = e[1:-1] + cE * (h[1:] - h[:-1])
-        
 
-        cE = (2*dt/((2*self._epsilon*sp.epsilon_0+np.sum(2*np.real(self._bp)))*self._mesh.steps()))
-        #Term multiplying e[1:-1] is 1 since conductivity=0
-        eNew[1:-1] = e[1:-1] + cE * ((h[1:] - h[:-1])-np.real(np.sum((1+self._kp)*Jp_old[1:-1,:],1)))
-        for i in range(0,np.shape(Jp_old)[1]):
-            JpNew[1:-1,i] = self._kp[i]*Jp_old[1:-1,i]+ self._bp[i] * (eNew[1:-1] - e[1:-1]) / dt
+
+        cE = dt / sp.epsilon_0 / self._mesh.steps()
+        eNew[1:-1] = e[1:-1] +    cE * (h[1:] - h[:-1])
+        
+        if self._dispLayer is not None:
+            Jp_old = self.oldJp.get()
+            JpNew = np.zeros( self.oldJp.Jp_old.shape )
+            cE2 = (2*dt/((2*self._epsilon*sp.epsilon_0+np.sum(2*np.real(self._bp)))*self._mesh.steps()))
+            #Term multiplying e[1:-1] is 1 since conductivity=0
+            #Need to add an extra term to indices for dh/dx
+            indH= np.concatenate(([self._layerIndices[0]-1],self._layerIndices,[self._layerIndices[-1]+1]))
+            eNew[self._layerIndices] = e[self._layerIndices] + cE2 * ((h[indH[1:]] \
+                - h[indH[:-1]])-np.real(np.sum((1+self._kp)*Jp_old,1)))
+            for i in range(0,np.shape(Jp_old)[1]):
+                JpNew[:,i] = self._kp[i]*Jp_old[:,i]+ self._bp[i] * (eNew[self._layerIndices] - e[self._layerIndices]) / dt
         # Boundary conditions
         for lu in range(2):
             if lu == 0:
