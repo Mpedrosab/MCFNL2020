@@ -6,7 +6,7 @@ def gaussian(t, delay, spread):
     return np.exp(- np.power(t-delay, 2) / (2.0 * np.power(spread, 2)) )
 
 
-s0 = 10e-6
+s0 = 10e-9
 t0 = 10 * s0
 N  = int (1e2+1)
 

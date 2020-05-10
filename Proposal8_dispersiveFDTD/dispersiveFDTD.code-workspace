@@ -2,6 +2,9 @@
 	"folders": [
 		{
 			"path": "..\\fdtd\\1d\\src"
+		},
+		{
+			"path": "..\\fdtd\\1d\\tests"
 		}
 	],
 	"settings": {}
