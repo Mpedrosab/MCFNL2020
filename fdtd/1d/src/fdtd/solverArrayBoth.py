@@ -97,7 +97,7 @@ class Solver:
           #  self.oldJp = ComplexField(Jp_old = np.zeros(( mesh.pos.size, len(self._dispLayer.ap))) )      #Takes the size of the layer, not the full grid
             if self._dispLayer is not None:
                 #Save values as if there is no layer to layer compare the results
-                p["valuesDispersive"] = p["values"].copy()
+                p["valuesFree"] = p["values"].copy()
 
     def solve(self, finalTime):
         tic = time.time()
@@ -254,13 +254,15 @@ class Solver:
                 values = np.zeros(ids[U]-ids[L])
 
                 values[:] = self.old.e[ ids[0]:ids[1] ]
-                p["values"].append(values)
-
+                #Save values as if there is no layer and layer compare the results
                 if self._dispLayer is not None:
                     valuesDisp = np.zeros(ids[U]-ids[L])
                     valuesDisp[:] = self.oldDispersive.eDispersive[ ids[0]:ids[1] ]
-                    p["valuesDispersive"].append(valuesDisp)
-                    #Save values as if there is no layer and layer compare the results
+                    p["values"].append(valuesDisp)
+                    p["valuesFree"].append(values)
+                else:
+                    p["values"].append(values)
+ 
 
 
     def _calcDispersionVar(self,dt,ap,cp):

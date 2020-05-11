@@ -2,14 +2,14 @@
     "format": "pyfdtd1d",
     
     "options": {
-        "finalTime": 5e-14,
+        "finalTime": 3e-14,
         "timeUnits": "s",
         "cfl": 1
     },
 
     "coordinates": [
         0.0,
-        10e-9,
+        9e-9,
         5e-9
     ],
 
@@ -56,7 +56,7 @@
                 "1.443-8.219e1j"
             ],
             "unitsFreq": "eV",
-            "startPosition": 8e-9,
+            "startPosition": 6e-9,
             "width":  1e-9
         },
 

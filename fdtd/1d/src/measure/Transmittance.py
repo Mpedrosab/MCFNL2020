@@ -11,36 +11,49 @@ class MeasureTransmittance:
 
         #Border of the layer
         self._endIndex = layer.indices[-1]
+        self._initIndex = layer.indices[0]
+
 
         #Get time
         self.t = np.array(t)
 
         #Get E field at both sides of the layer
-        self._initE = np.zeros(self.t.size)
-        self._endE = np.zeros(self.t.size)
+        self._initEFree = np.zeros(self.t.size)
+        self._endEFree = np.zeros(self.t.size)
+        self._transE = np.zeros(self.t.size)
+        self._reflectE = np.zeros(self.t.size)
 
         for i in range(0,len(field),1):
 
             if i==0:        #First element is a list with an array inside (do not know why)
-                self._initE[i] = field[i][0][self._endIndex ]
-                self._endE[i] = fieldDispersed[i][0][self._endIndex ]
+                self._initEFree[i] = field[i][0][self._initIndex ]
+                self._endEFree[i] = field[i][0][self._endIndex ]
+                self._transE[i] = fieldDispersed[i][0][self._endIndex ]
+                self._reflectE[i] = fieldDispersed[i][0][self._initIndex ]
             else:
-                self._initE[i] = field[i][self._endIndex]
-                self._endE[i] = fieldDispersed[i][self._endIndex ]               
+                self._initEFree[i] = field[i][self._initIndex]
+                self._endEFree[i] = field[i][self._endIndex]
+                self._transE[i] = fieldDispersed[i][self._endIndex ]               
+                self._reflectE[i] = fieldDispersed[i][self._initIndex ]               
 
-        print(i)
 
-    def getT(self, initE, endE):
-        self.ratio = np.abs(np.fft.fft(endE) )/np.abs(np.fft.fft(initE ))
-        #self.T = np.nan_to_num(self.T)
-        return self.ratio
+    def T(self):
 
-    def AmplVsFreq(self):
-        self.Tq = self.getT(self._initE, self._endE)
+        self.Tq =np.abs(np.fft.fft(self._transE) )/np.abs(np.fft.fft(self._endEFree))
+        self.f_Tq = np.fft.fftfreq(len(self.t)) / (self.t[1]-self.t[0])
+        return (self.f_Tq,np.abs(self.Tq))
+
+    def R(self):
+        self.Tq = np.abs(np.fft.fft(self._initEFree)-np.fft.fft(self._reflectE) )/np.abs(np.fft.fft(self._initEFree ))
         self.f_Tq = np.fft.fftfreq(len(self.t)) / (self.t[1]-self.t[0])
 
+        return (self.f_Tq,np.abs(self.Tq)) 
 
-        return (self.f_Tq,np.abs(self.Tq))
+    def TransmittanceReflect(self):
+        self.reflect = np.abs(np.fft.fft(self._initEFree)-np.fft.fft(self._reflectE) )**2/np.abs(np.fft.fft(self._initEFree))**2
+        self.trans = 1-self.reflect
+        #self.T = np.nan_to_num(self.T)
+        return self.f_Tq, self.trans, self.reflect
 
 
 class AnalyticTransmittance:
@@ -55,7 +68,7 @@ class AnalyticTransmittance:
         try:
             self.mu_r = layer.mu
         except:
-            self.mu_r = 1.0
+            self.mu_r = -2.3*10e-5
             Warning('mu not defined. Setting to 1.0')
 
         try:
@@ -101,13 +114,24 @@ class AnalyticTransmittance:
             self._den(omega)
 
 class PlotTransmittance:
-    def __init__(self,freq,Trans):
+    def __init__(self,freq,Trans, labels=[]):
         #plt.figure()
         #plt.plot(freq, np.abs(Trans))
         plt.figure()
-        Trans = Trans[freq>=0]
-        freq = freq[freq>=0]
-        plt.plot(freq, Trans)
+        i=0
+        if type(Trans)!= list:
+            Trans = [Trans]      
+        if type(labels)!= list:
+            labels = [labels]
+        for element in Trans:
+            element = element[freq>=0]
+            if not labels:
+                setLabel = '__no label__'
+            else:
+                setLabel=labels[i]
+            i+=1
+            plt.plot(freq[freq>=0], element,label=setLabel)
         plt.xlabel('Frequency [Hz]')
-        plt.ylabel('Transmittance')
+        plt.ylabel('%')
+        plt.legend()
         plt.show()
