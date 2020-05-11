@@ -35,6 +35,7 @@ class Panel:
         return phi[0,0]*eta_0 + phi[0,1] + phi[1,0]*eta_0**2 + phi[1,1]*eta_0
         
     def T(self, omega):
+        sol =  2*eta_0 / self._den(omega)
         return  2*eta_0 / self._den(omega)
 
     def R(self, omega): 

@@ -20,7 +20,7 @@
 
     "grid": {   
         "elemId": 0,
-        "steps": 0.015,
+        "steps": 0.005,
         "bounds": ["mur", "mur"]
     },
 
@@ -40,14 +40,14 @@
         {
             "permittivity": 1,
             "ap": [
-                "1e7+1e7j","-1e7+1e7j"
+                "-1-8j", "-2+2j","-0.5-1j"
             ],
             "cp": [
-                "0.5e7+2e7j","-3e7-0.1e7j"
+                "5+2j", "3-0.1j", "3-6j"
             ],
             "unitsFreq": "Hz",
-            "startPosition": 0.7,
-            "width":  0.1
+            "startPosition": 0.55,
+            "width":  0.3
         },
 
     "probes": [

@@ -3,7 +3,7 @@ import matplotlib.animation as animation
 
 class Animator:
 
-    def __init__(self, mesh, probe,analytical=None, layer=None):
+    def __init__(self, mesh, probe,analytical=None, layer=None,fps=5):
             
         ids = probe["indices"]
         gridE = mesh.pos[ids[0]:ids[1]]
@@ -37,7 +37,7 @@ class Animator:
             
         #print(probeTime)
         animation.FuncAnimation(fig, animate, init_func=init,
-            frames=len(probeTime), blit=True)
+            frames=len(probeTime), interval=1000/fps, blit=True)
 
         plt.show()
 

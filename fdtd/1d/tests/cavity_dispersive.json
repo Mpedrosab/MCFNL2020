@@ -20,7 +20,7 @@
 
     "grid": {   
         "elemId": 0,
-        "steps": 0.025,
+        "steps": 0.005,
         "bounds": ["mur", "mur"]
     },
 
@@ -55,9 +55,9 @@
                 "1.806+4.563j",
                 "1.443-8.219e1j"
             ],
-            "unitsFreq": "eV",
+            "unitsFreq": "Hz",
             "startPosition": 0.6,
-            "width":  0.1
+            "width":  1e-9
         },
 
     "probes": [

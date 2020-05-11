@@ -7,36 +7,38 @@ class MeasureTransmittance:
     '''
         Measure transmittance through a layer
     '''
-    def __init__(self,layer,probe):
-        self._initIndex = layer.indices[0]
+    def __init__(self,layer,t,field, fieldDispersed):
+
+        #Border of the layer
         self._endIndex = layer.indices[-1]
 
         #Get time
-        self.t = np.array(probe['time'])
+        self.t = np.array(t)
 
         #Get E field at both sides of the layer
         self._initE = np.zeros(self.t.size)
         self._endE = np.zeros(self.t.size)
-        i=0
-        for p in probe['values']:
+
+        for i in range(0,len(field),1):
 
             if i==0:        #First element is a list with an array inside (do not know why)
-                self._initE[i] = p[0][self._initIndex ]
-                self._endE[i] = p[0][self._endIndex ]
+                self._initE[i] = field[i][0][self._endIndex ]
+                self._endE[i] = fieldDispersed[i][0][self._endIndex ]
             else:
-                self._initE[i] = p[self._initIndex ]
-                self._endE[i] = p[self._endIndex ]               
-            i+=1
+                self._initE[i] = field[i][self._endIndex]
+                self._endE[i] = fieldDispersed[i][self._endIndex ]               
+
+        print(i)
 
     def getT(self, initE, endE):
-        self.T = endE/initE
-        self.T = np.nan_to_num(self.T)
-        return self.T
+        self.ratio = np.abs(np.fft.fft(endE) )/np.abs(np.fft.fft(initE ))
+        #self.T = np.nan_to_num(self.T)
+        return self.ratio
 
     def AmplVsFreq(self):
-        self.T = self.getT(self._initE, self._endE)
+        self.Tq = self.getT(self._initE, self._endE)
         self.f_Tq = np.fft.fftfreq(len(self.t)) / (self.t[1]-self.t[0])
-        self.Tq = np.fft.fft(self.T )
+
 
         return (self.f_Tq,np.abs(self.Tq))
 
@@ -89,7 +91,8 @@ class AnalyticTransmittance:
         return phi[0,0]*self._eta_0 + phi[0,1] + phi[1,0]*self._eta_0**2 + phi[1,1]*self._eta_0
         
     def T(self, omega):
-        return  2*self._eta_0 / self._den(omega)
+        sol = 2*self._eta_0 / self._den(omega)
+        return  sol
 
     def R(self, omega): 
         phi = self.phi(omega)
@@ -104,7 +107,7 @@ class PlotTransmittance:
         plt.figure()
         Trans = Trans[freq>=0]
         freq = freq[freq>=0]
-        plt.plot(np.fft.fftshift(freq), np.fft.fftshift(np.abs(Trans)))
+        plt.plot(freq, Trans)
         plt.xlabel('Frequency [Hz]')
         plt.ylabel('Transmittance')
         plt.show()

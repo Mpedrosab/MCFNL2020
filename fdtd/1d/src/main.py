@@ -5,7 +5,7 @@ import os.path
 import sys
 
 from fdtd.mesh import Mesh
-from fdtd.solver import Solver
+from fdtd.solverArrayBoth import Solver
 from fdtd.viewer import Animator
 from fdtd.comparison import AnalyticComp
 from fdtd.dispersiveMedia import DispersiveMedia
@@ -15,14 +15,14 @@ print("=== Python FDTD 1D")
 '''
 parser = argparse.ArgumentParser(description='Python FDTD 1D')
 parser.add_argument('-i', '--input', nargs=1, type=str)
-args = parser.parse_args()
+args = parser.parse_args()0
 if len(sys.argv) == 1:
     parser.print_help()
     sys.exit()
 
 inputFilename = ''.join(args.input).strip()
 '''
-inputFilename='..\\tests\\cavity_dispersive_test_NoComplex.json'
+inputFilename='..\\tests\\cavity_dispersive.json'
 print("--- Reading file: %s"%(inputFilename))
 data = json.load(open(inputFilename))
 
@@ -43,18 +43,22 @@ solver.solve(data["options"]["finalTime"])
 print('--- Visualizing')
 solNum=solver.getProbes()[0]
 
+
 #Measure transmittance
-transmittance = MeasureTransmittance(layer,solNum)
+transmittance = MeasureTransmittance(layer,solNum['time'],solNum['values'],solNum['valuesDispersive'])
 freq, transfft = transmittance.AmplVsFreq()
 PlotTransmittance(freq, transfft)
 
 
 #Analytical transmittance
 transmittanceReal = AnalyticTransmittance(layer)
+import numpy as np
+#freq  = np.linspace(1e2/(2 * np.pi), 1e10/(2 * np.pi), int(1e2+1)) * 2 * np.pi
+#freq = np.linspace(1e14,12e14,1000)
 transReal = transmittanceReal.T(freq)
-PlotTransmittance(freq, transReal)
+PlotTransmittance(freq, np.abs(transReal))
 
-Animator(mesh, solNum,layer=layer)
+Animator(mesh, solNum,layer=layer, fps=50)
 #%%
 '''
 print('--- Comparison with analytical solution')
