@@ -2,7 +2,7 @@
     "format": "pyfdtd1d",
     
     "options": {
-        "finalTime": 3e-14,
+        "finalTime": 3e-15,
         "timeUnits": "s",
         "cfl": 1
     },

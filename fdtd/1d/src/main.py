@@ -22,7 +22,7 @@ if len(sys.argv) == 1:
 
 inputFilename = ''.join(args.input).strip()
 '''
-inputFilename='..\\tests\\cavity_dispersive_test_NoComplex.json'
+inputFilename='..\\tests\\cavity_dispersive_test.json'
 print("--- Reading file: %s"%(inputFilename))
 data = json.load(open(inputFilename))
 
@@ -50,18 +50,21 @@ freq, transCoef= transmission.T()
 freq, reflecCoef= transmission.R()
 PlotTransmittance(freq, [transCoef,reflecCoef],labels=['T','R'])
 freq, transmittance,reflectance= transmission.TransmittanceReflect()
-PlotTransmittance(freq, [transmittance,reflectance],labels=['Transmittance','Reflectance')
+PlotTransmittance(freq, [transmittance,reflectance],labels=['Transmittance','Reflectance'])
 
 #Analytical transmittance
+#layer.width = 100e-9
 transmittanceReal = AnalyticTransmittance(layer)
 import numpy as np
 #freq  = np.linspace(1e2/(2 * np.pi), 1e10/(2 * np.pi), int(1e2+1)) * 2 * np.pi
-freq = np.linspace(1e14,12e14,1000)
-transReal = transmittanceReal.T(freq)
+#freq = np.linspace(1e14,12e14,1000)
 
-PlotTransmittance(freq, np.abs(transReal),labels='T')
-layer['width'] = 100e-9
-Animator(mesh, solNum,layer=layer, fps=5)
+transReal = transmittanceReal.T(freq)
+reflecReal = transmittanceReal.R(freq)
+PlotTransmittance(freq, [np.abs(transReal),np.abs(reflecReal)],labels=['T','R'])
+
+Animator(mesh, solNum,layer=layer,dispAndFree=True, fps=100)
+input("Press [enter] to finish.")
 #%%
 '''
 print('--- Comparison with analytical solution')

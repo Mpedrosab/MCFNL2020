@@ -83,7 +83,7 @@ class Solver:
         if dispLayer is not None:
 
             self._dispLayer=copy.deepcopy(dispLayer)
-            self._epsilon=self._dispLayer.epsilon
+
             self._layerIndices = self._dispLayer.indices
 
 
@@ -92,12 +92,13 @@ class Solver:
             self._cp=np.zeros(( mesh.pos.size, len(self._dispLayer.ap)))
             self._ap[self._dispLayer.indices,:]= self._dispLayer.ap
             self._cp[self._dispLayer.indices,:]= self._dispLayer.cp 
+            self._epsilon=np.ones( mesh.pos.size)
+            self._epsilon[self._dispLayer.indices]=self._dispLayer.epsilon
              #Changed?
             self.oldDispersive = ComplexField(Jp_old = np.zeros(( mesh.pos.size, len(self._dispLayer.ap))), eDispersive= values.copy(), hDispersive = np.zeros( mesh.pos.size-1 ) )      #Takes the size of the layer, not the full grid
           #  self.oldJp = ComplexField(Jp_old = np.zeros(( mesh.pos.size, len(self._dispLayer.ap))) )      #Takes the size of the layer, not the full grid
-            if self._dispLayer is not None:
-                #Save values as if there is no layer to layer compare the results
-                p["valuesFree"] = p["values"].copy()
+            #Save values as if there is no layer to layer compare the results
+            p["valuesFree"] = p["values"].copy()
 
     def solve(self, finalTime):
         tic = time.time()
@@ -128,6 +129,8 @@ class Solver:
 
 
     def _dt(self):
+        print ('dt for cfl condition: ', self.options["cfl"] * self._mesh.steps() / sp.speed_of_light)
+        input("Press Enter to continue...")
         return self.options["cfl"] * self._mesh.steps() / sp.speed_of_light  
 
     def timeStep(self):
@@ -152,7 +155,6 @@ class Solver:
             #Term multiplying e[1:-1] is 1 since conductivity=0
             #Need to add an extra term to indices for dh/dx
             #indH= np.concatenate(([self._layerIndices[0]-1],self._layerIndices,))
-            indH = self._layerIndices[:-1]
             #Changed?
             eNewDisp[1:-1] = eDisp[1:-1] + cE2[1:-1] * ((hDisp[1:] \
                - hDisp[:-1])-np.real(np.sum((1+self._kp[1:-1,:])*Jp_old[1:-1,:],1)))
@@ -220,7 +222,6 @@ class Solver:
             #Get new JpNew
             for i in range(0,np.shape(Jp_old)[1]):
                 
-                #Changed?
                JpNew[1:-1,i] = self._kp[1:-1,i]*Jp_old[1:-1,i]+ self._bp[1:-1,i] * (eNewDisp[1:-1] - eDisp[1:-1]) / dt
                # JpNew[1:-1,i] = self._kp[i]*Jp_old[1:-1,i]+ self._bp[i] * (eNew[1:-1] - e[1:-1]) / dt
             Jp_old[:] = JpNew[:]
@@ -233,10 +234,11 @@ class Solver:
         hNew = np.zeros( self.old.h.shape )
         (e, h) = self.old.get()
         cH = dt / sp.mu_0 / self._mesh.steps()
+        #Get also field for free particle
         hNew[:] = h[:] + cH * (e[1:] - e[:-1])
         h[:] = hNew[:]
 
-#Get also field for free particle
+
         if self._dispLayer is not None:
             hNewDisp = np.zeros( self.oldDispersive.hDispersive.shape )
             (J_old,eDisp, hDisp) = self.oldDispersive.get()

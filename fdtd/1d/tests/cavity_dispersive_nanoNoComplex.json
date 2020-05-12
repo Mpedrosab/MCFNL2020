@@ -2,7 +2,7 @@
     "format": "pyfdtd1d",
     
     "options": {
-        "finalTime": 20e-11,
+        "finalTime": 20e-9,
         "timeUnits": "s",
         "cfl": 1
     },
@@ -30,8 +30,8 @@
             "direction": [0.0, 0.0, 1.0],
             "magnitude": {
                 "type": "gaussian",
-                "gaussianDelay":  1.25e-11,
-                "gaussianSpread": 0.25e-11
+                "gaussianDelay":  1.25e-9,
+                "gaussianSpread": 0.25e-9
                 
             },
             "elemId": 1

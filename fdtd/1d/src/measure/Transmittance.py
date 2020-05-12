@@ -15,7 +15,7 @@ class MeasureTransmittance:
 
 
         #Get time
-        self.t = np.array(t)
+        self.t = np.array(t)[1:]
 
         #Get E field at both sides of the layer
         self._initEFree = np.zeros(self.t.size)
@@ -23,7 +23,7 @@ class MeasureTransmittance:
         self._transE = np.zeros(self.t.size)
         self._reflectE = np.zeros(self.t.size)
 
-        for i in range(0,len(field),1):
+        for i in range(0,len(field)-1,1):
 
             if i==0:        #First element is a list with an array inside (do not know why)
                 self._initEFree[i] = field[i][0][self._initIndex ]
@@ -36,15 +36,15 @@ class MeasureTransmittance:
                 self._transE[i] = fieldDispersed[i][self._endIndex ]               
                 self._reflectE[i] = fieldDispersed[i][self._initIndex ]               
 
-
     def T(self):
 
         self.Tq =np.abs(np.fft.fft(self._transE) )/np.abs(np.fft.fft(self._endEFree))
         self.f_Tq = np.fft.fftfreq(len(self.t)) / (self.t[1]-self.t[0])
-        return (self.f_Tq,np.abs(self.Tq))
+        #self.Tq = np.abs(self._transE) / np.abs(self._endEFree)
+        return (self.t,np.abs(self.Tq))
 
     def R(self):
-        self.Tq = np.abs(np.fft.fft(self._initEFree)-np.fft.fft(self._reflectE) )/np.abs(np.fft.fft(self._initEFree ))
+        self.Tq = np.abs(np.fft.fft(self._initEFree)-np.fft.fft(self._reflectE))/np.abs(np.fft.fft(self._initEFree ))
         self.f_Tq = np.fft.fftfreq(len(self.t)) / (self.t[1]-self.t[0])
 
         return (self.f_Tq,np.abs(self.Tq)) 
@@ -66,9 +66,9 @@ class AnalyticTransmittance:
         self._eta_0 = np.sqrt(mu_0/epsilon_0)
 
         try:
-            self.mu_r = layer.mu
+            self.mu_r = layer.suscept
         except:
-            self.mu_r = -2.3*10e-5
+            self.mu_r = 1
             Warning('mu not defined. Setting to 1.0')
 
         try:
@@ -132,6 +132,7 @@ class PlotTransmittance:
             i+=1
             plt.plot(freq[freq>=0], element,label=setLabel)
         plt.xlabel('Frequency [Hz]')
-        plt.ylabel('%')
+        plt.ylabel('Ratio')
         plt.legend()
+        plt.ion()
         plt.show()
