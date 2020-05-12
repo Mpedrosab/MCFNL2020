@@ -22,10 +22,15 @@
         "steps": 0.025,
         "bounds": ["mur", "mur"]
     },
-
     "sources": [
         {
-            "type": "none",
+            "type": "dipole", 
+            "direction": [0.0, 0.0, 1.0],
+            "magnitude": {
+                "type": "gaussian",
+                "gaussianDelay":  1.25e-9,
+                "gaussianSpread": 0.25e-9
+            },
             "elemId": 1
         }
     ],

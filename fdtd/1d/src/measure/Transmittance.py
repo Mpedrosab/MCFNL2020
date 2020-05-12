@@ -50,7 +50,7 @@ class MeasureTransmittance:
         return (self.f_Tq,np.abs(self.Tq)) 
 
     def TransmittanceReflect(self):
-        self.reflect = np.abs(np.fft.fft(self._initEFree)-np.fft.fft(self._reflectE) )**2/np.abs(np.fft.fft(self._initEFree))**2
+        self.reflect = np.fft.fft(np.abs(self._initEFree-self._reflectE))**2/np.abs(np.fft.fft(self._initEFree))**2
         self.trans = 1-self.reflect
         #self.T = np.nan_to_num(self.T)
         return self.f_Tq, self.trans, self.reflect

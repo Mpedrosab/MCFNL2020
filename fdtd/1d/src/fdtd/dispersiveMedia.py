@@ -17,15 +17,24 @@ class DispersiveMedia:
             self.ap[i]=complex(self._media["ap"][i])
             self.cp[i]=complex(self._media["cp"][i])
         
+
+        #Change units
         if (self._media['unitsFreq']!="Hz"):
             if (self._media['unitsFreq']=="eV"):
                 self.ap = self.ap * sp.e/sp.h
                 self.cp = self.cp * sp.e/sp.h
-            elif (self._media['unitsFreq']=="GHz"):
+
+            elif (self._media['unitsFreq']=="kHz"):
+                self.ap = self.ap * 10e3
+                self.cp = self.cp * 10e3
+            elif (self._media['unitsFreq']=="MHz"):
                 self.ap = self.ap * 10e6
-                self.cp = self.cp * 10e6
+                self.cp = self.cp * 10e6  
+            elif (self._media['unitsFreq']=="GHz"):
+                self.ap = self.ap * 10e9
+                self.cp = self.cp * 10e9  
             else:
-                raise ValueError("Invalid frequency units. Frequency must be in Hz or eV")
+                raise ValueError("Invalid frequency units. Frequency must be in multiples of Hz or eV")
         #self.cp=self.cp * sp.epsilon_0
         # self.epsilon= self.epsilon * sp.epsilon_0
     #WATCH OUT! Normalize permittivity0

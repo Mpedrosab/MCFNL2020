@@ -34,7 +34,7 @@ mesh = Mesh(data["coordinates"], data["elements"], data["grid"])
 layer = DispersiveMedia(mesh,data["dispersiveLayers"])
 #indeces = layer.layerIndices(mesh)
 print('--- Initializing solver')
-
+#layer=None
 solver = Solver(mesh, data["options"], data["probes"], data["sources"],dispLayer = layer)
 
 print('--- Solving')
@@ -42,7 +42,6 @@ solver.solve(data["options"]["finalTime"])
 
 print('--- Visualizing')
 solNum=solver.getProbes()[0]
-
 
 #Measure transmittance
 transmission = MeasureTransmittance(layer,solNum['time'],solNum['valuesFree'],solNum['values'])
