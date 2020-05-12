@@ -2,14 +2,14 @@
     "format": "pyfdtd1d",
     
     "options": {
-        "finalTime": 20e-14,
+        "finalTime": 20e-19,
         "timeUnits": "s",
         "cfl": 1
     },
 
     "coordinates": [
         0.0,
-        1.5e-9,
+        1e-9,
         0.3e-9
     ],
 
@@ -20,7 +20,7 @@
 
     "grid": {   
         "elemId": 0,
-        "steps": 0.05e-9,
+        "steps": 0.0001e-9,
         "bounds": ["mur", "mur"]
     },
 
@@ -30,15 +30,15 @@
             "direction": [0.0, 0.0, 1.0],
             "magnitude": {
                 "type": "gaussian",
-                "gaussianDelay":  1.25e-14,
-                "gaussianSpread": 0.25e-14
+                "gaussianDelay":  1.25e-19,
+                "gaussianSpread": 0.25e-19
             },
             "elemId": 1
         }
     ],
     "dispersiveLayers": 
         {
-            "permittivity": 2,
+            "permittivity": 1.5,
             "permeability":1,
             "ap": [
                 "-2.502e-2-8.626e-3j",
@@ -58,7 +58,7 @@
             ],
             "unitsFreq": "eV",
             "startPosition": 0.4e-9,
-            "width":  1e-9
+            "width":  0.5e-9
         },
 
     "probes": [

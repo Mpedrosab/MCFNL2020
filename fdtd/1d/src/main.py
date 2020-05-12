@@ -22,7 +22,7 @@ if len(sys.argv) == 1:
 
 inputFilename = ''.join(args.input).strip()
 '''
-inputFilename='..\\tests\\cavity_dispersive_test.json'
+inputFilename='..\\tests\\cavity_dispersive_test_NoComplex.json'
 print("--- Reading file: %s"%(inputFilename))
 data = json.load(open(inputFilename))
 
@@ -49,7 +49,7 @@ freq, transCoef= transmission.T()
 freq2, reflecCoef= transmission.R()
 PlotTransmittance(freq, [transCoef,reflecCoef],labels=['T','R'])
 freq2, transmittance,reflectance= transmission.TransmittanceReflect()
-PlotTransmittance(freq, [transmittance,reflectance],labels=['Transmittance','Reflectance'])
+PlotTransmittance(freq2, [transmittance,reflectance],labels=['Transmittance','Reflectance'])
 
 #Analytical transmittance
 #layer.width = 100e-9
