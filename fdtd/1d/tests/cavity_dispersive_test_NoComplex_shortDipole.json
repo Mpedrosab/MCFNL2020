@@ -20,7 +20,7 @@
 
     "grid": {   
         "elemId": 0,
-        "steps": 0.005,
+        "steps": 0.001,
         "bounds": ["mur", "mur"]
     },
 
@@ -31,14 +31,14 @@
             "magnitude": {
                 "type": "gaussian",
                 "gaussianDelay":  0.25e-8,
-                "gaussianSpread": 0.025e-8
+                "gaussianSpread": 0.025e-10
             },
             "elemId": 1
         }
     ],
     "dispersiveLayers": 
         {
-            "permittivity": 1,
+            "permittivity": 5,
             "permeability":1,
             "ap": [
                 0

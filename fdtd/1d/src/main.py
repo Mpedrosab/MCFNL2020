@@ -5,7 +5,7 @@ import os.path
 import sys
 
 from fdtd.mesh import Mesh
-from fdtd.solverArrayBoth import Solver
+from fdtd.solver import Solver
 from fdtd.viewer import Animator
 from fdtd.comparison import AnalyticComp
 from fdtd.dispersiveMedia import DispersiveMedia
@@ -46,9 +46,9 @@ solNum=solver.getProbes()[0]
 #Measure transmittance
 transmission = MeasureTransmittance(layer,solNum['time'],solNum['valuesFree'],solNum['values'])
 freq, transCoef= transmission.T()
-freq, reflecCoef= transmission.R()
+freq2, reflecCoef= transmission.R()
 PlotTransmittance(freq, [transCoef,reflecCoef],labels=['T','R'])
-freq, transmittance,reflectance= transmission.TransmittanceReflect()
+freq2, transmittance,reflectance= transmission.TransmittanceReflect()
 PlotTransmittance(freq, [transmittance,reflectance],labels=['Transmittance','Reflectance'])
 
 #Analytical transmittance

@@ -41,16 +41,19 @@ class MeasureTransmittance:
         self.Tq =np.abs(np.fft.fft(self._transE) )/np.abs(np.fft.fft(self._endEFree))
         self.f_Tq = np.fft.fftfreq(len(self.t)) / (self.t[1]-self.t[0])
         #self.Tq = np.abs(self._transE) / np.abs(self._endEFree)
-        return (self.t,np.abs(self.Tq))
-
+        #        self.Tq =np.abs(np.fft.fftshift(np.fft.fft(self._transE)) )/np.abs(np.fft.fftshift(np.fft.fft(self._endEFree)))
+#        self.f_Tq = (np.fft.fftshift(np.fft.fftfreq(len(self.t)) ))/ (self.t[1]-self.t[0])
+#       return (self.f_Tq,np.abs(self.Tq))
+        return (np.fft.fftshift(self.f_Tq),np.abs(self.Tq))
     def R(self):
         self.Tq = np.abs(np.fft.fft(self._initEFree)-np.fft.fft(self._reflectE))/np.abs(np.fft.fft(self._initEFree ))
         self.f_Tq = np.fft.fftfreq(len(self.t)) / (self.t[1]-self.t[0])
 
-        return (self.f_Tq,np.abs(self.Tq)) 
-
+        #return (self.f_Tq,np.abs(self.Tq)) 
+        return (np.fft.fftshift(self.f_Tq),np.abs(self.Tq))
+    
     def TransmittanceReflect(self):
-        self.reflect = np.fft.fft(np.abs(self._initEFree-self._reflectE))**2/np.abs(np.fft.fft(self._initEFree))**2
+        self.reflect = np.abs(np.fft.fft(self._initEFree)-np.fft.fft(self._reflectE))**2/np.abs(np.fft.fft(self._initEFree))**2
         self.trans = 1-self.reflect
         #self.T = np.nan_to_num(self.T)
         return self.f_Tq, self.trans, self.reflect
@@ -133,6 +136,7 @@ class PlotTransmittance:
             plt.plot(freq[freq>=0], element,label=setLabel)
         plt.xlabel('Frequency [Hz]')
         plt.ylabel('Ratio')
+       # plt.ylim(-0.5,1.5)
         plt.legend()
         plt.ion()
         plt.show()
