@@ -93,7 +93,6 @@ class Solver:
             self._cp=self._dispLayer.cp 
              #Changed?
             self.oldDispersive = ComplexField(Jp_old = np.zeros(( self._dispLayer.coords.size, len(self._dispLayer.ap))), eDispersive= values.copy(), hDispersive = np.zeros( mesh.pos.size-1 ) )      #Takes the size of the layer, not the full grid
-          #  self.oldJp = ComplexField(Jp_old = np.zeros(( mesh.pos.size, len(self._dispLayer.ap))) )      #Takes the size of the layer, not the full grid
             self._layerIndices = self._dispLayer.indices
             #Save values as if there is no layer to layer compare the results 
             p["valuesFree"] = p["values"].copy()
@@ -156,13 +155,8 @@ class Solver:
             #Term multiplying e[1:-1] is 1 since conductivity=0
             #Need to add an extra term to indices for dh/dx
             indH= np.concatenate(([self._layerIndices[0]-1],self._layerIndices))
-            #indH = self._layerIndices[:-1]
-            #Changed?
-    #        eNewDisp[self._layerIndices[1:-1]] = eDisp[self._layerIndices[1:-1]] + cE2 * ((hDisp[indH[1:]] \
-   #            - hDisp[indH[:-1]])-np.real(np.sum((1+self._kp)*Jp_old[1:-1,:],1)))
             eNewDisp[self._layerIndices] = eDisp[self._layerIndices] + cE2 * ((hDisp[indH[1:]] \
                - hDisp[indH[:-1]])-np.real(np.sum((1+self._kp)*Jp_old[:,:],1)))
-           # eNew[1:-1] = e[1:-1] + cE2 * ((h[1:] - h[:-1])-np.real(np.sum((1+self._kp)*Jp_old[1:-1],1)))
 
 
         #add mur conditions to layer

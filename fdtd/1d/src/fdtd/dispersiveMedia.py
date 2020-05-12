@@ -35,12 +35,6 @@ class DispersiveMedia:
                 self.cp = self.cp * 10e9  
             else:
                 raise ValueError("Invalid frequency units. Frequency must be in multiples of Hz or eV")
-        #self.cp=self.cp * sp.epsilon_0
-        # self.epsilon= self.epsilon * sp.epsilon_0
-    #WATCH OUT! Normalize permittivity0
-        #self.ap = self.ap / self._media['permittivity']
-        #self.cp = self.cp / self._media['permittivity']
-        #self.epsilon = self.epsilon / self.media['permittivity']   
 
         #Get layer coord
         self.indices=self.layerIndices(mesh)

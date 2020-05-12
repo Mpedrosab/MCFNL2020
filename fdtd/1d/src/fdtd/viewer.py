@@ -16,13 +16,14 @@ class Animator:
 
         fig = plt.figure(figsize=(8,4))
         ax1 = fig.add_subplot(1, 1, 1)
-        upperlim = np.min([np.nanmax(values[1:]),1])
-        lowerlim = np.max([np.nanmin(values[1:]),-1])
+        #upperlim = np.min([np.nanmax(values[1:]),1])
+        #lowerlim = np.max([np.nanmin(values[1:]),-1])
         ax1 = plt.axes(xlim=(gridE[0], gridE[-1]), ylim=(-1, 1))
         ax1.grid(color='gray', linestyle='--', linewidth=.2)
         ax1.set_xlabel('X coordinate [m]')
         ax1.set_ylabel('Field')
         line1,    = ax1.plot([], [], '-', markersize=1)
+        
         if dispAndFree:
             valuesFree    = probe["valuesFree"][:]
         line2,    = ax1.plot([], [], '-', markersize=1)     #For dispersive and free space
@@ -51,7 +52,6 @@ class Animator:
             timeText1.set_text('Time = %.1E [ns]' % (probeTime[i]*1e9))
             return line1,line2, timeText1
             
-        #print(probeTime)
         animation.FuncAnimation(fig, animate, init_func=init,
             frames=len(probeTime), interval=1000/fps, blit=True)
 
