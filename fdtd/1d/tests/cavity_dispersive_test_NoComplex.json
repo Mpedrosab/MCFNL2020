@@ -38,7 +38,7 @@
     ],
     "dispersiveLayers": 
         {
-            "permittivity": 1,
+            "permittivity": 2,
             "permeability":1,
             "ap": [
                 0
@@ -48,7 +48,7 @@
             ],
             "unitsFreq": "Hz",
             "startPosition": 0.3,
-            "width":  0.1
+            "width":  0.5
         },
 
     "probes": [

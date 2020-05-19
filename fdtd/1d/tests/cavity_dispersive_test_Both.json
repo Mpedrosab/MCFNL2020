@@ -56,7 +56,7 @@
                 "1.806+4.563j",
                 "1.443-8.219e1j"
             ],
-            "unitsFreq": "MHz",
+            "unitsFreq": "Hz",
             "startPosition": 0.4,
             "width":  1
         },

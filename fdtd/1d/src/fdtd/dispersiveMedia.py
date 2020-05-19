@@ -33,6 +33,9 @@ class DispersiveMedia:
             elif (self._media['unitsFreq']=="GHz"):
                 self.ap = self.ap * 10e9
                 self.cp = self.cp * 10e9  
+            elif (self._media['unitsFreq']=="THz"):
+                self.ap = self.ap * 10e12
+                self.cp = self.cp * 10e12  
             else:
                 raise ValueError("Invalid frequency units. Frequency must be in multiples of Hz or eV")
 

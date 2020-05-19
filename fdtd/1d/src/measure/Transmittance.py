@@ -69,13 +69,13 @@ class AnalyticTransmittance:
             self.mu_r = layer.suscept
         except:
             self.mu_r = 1
-            Warning('mu not defined. Setting to 1.0')
+            print('mu not defined. Setting to 1.0')
 
         try:
             self.sigma = sigma
         except:
             self.sigma = 0.0
-            Warning('sigma not defined. Setting to 0.0')
+            print('sigma not defined. Setting to 0.0')
 
     def epsilon_c(self, omega):
         complexEps = 0
@@ -130,6 +130,7 @@ class PlotTransmittance:
             i+=1
             plt.plot(freq[freq>=0], element,label=setLabel)
         plt.xlabel('Frequency [Hz]')
+        plt.xscale('log')
         plt.ylabel('Ratio')
        # plt.ylim(-0.5,1.5)
         plt.legend()
